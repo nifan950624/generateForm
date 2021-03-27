@@ -23,14 +23,16 @@ function generateChildrenComponents(h, formData, children, vm) {
 }
 
 function generateSelectComponent(h, formData = {}, obj, vm) {
-  const { options = [] } = obj
+  const { options = [], key } = obj
   const optionComponents = options.map(option => {
     return h(
       'ElOption',
       {
-        props: obj.props || {},
-        style: obj.style,
-        slot: obj.slot
+        props: {
+          label: option.label,
+          value: option.value,
+          key: option.value
+        }
       },
       optionComponents
     )
@@ -38,11 +40,22 @@ function generateSelectComponent(h, formData = {}, obj, vm) {
   return h(
     'ElSelect',
     {
-      props: obj.props || {},
+      props: {
+        value: formData[key] || '',
+        placeholder: '请选择'
+      },
+      attrs: obj.props,
       slot: obj.slot,
       style: obj.style,
-      on: obj.on,
-      nativeOn: obj.nativeOn
+      on: {
+        ...translateEvents(obj.on, vm),
+        input(val) {
+          if (key) {
+            formData[key] = val
+          }
+        }
+      },
+      slot: obj.slot
     },
     optionComponents
   )
@@ -55,6 +68,7 @@ function generateInputComponent(h, formData = {}, obj, vm) {
   return h(
     'ElInput',
     {
+      class: obj.class || '',
       props: {
         value: key ? formData[key] : '',
         ...obj.props
@@ -81,6 +95,7 @@ function generateButtonComponent(h, formData = {}, obj, vm) {
   return h(
     'ElButton',
     {
+      class: obj.class || '',
       props: obj.props || {},
       slot: obj.slot,
       style: obj.style,
