@@ -1,6 +1,7 @@
 const componentObj = {
   input: generateInputComponent,
-  button: generateButtonComponent
+  button: generateButtonComponent,
+  select: generateSelectComponent
 }
 
 function generateChildrenComponents(h, formData, children, vm) {
@@ -21,9 +22,33 @@ function generateChildrenComponents(h, formData, children, vm) {
   })
 }
 
-function generateInputComponent(h, formData = {}, obj, vm) {
-  console.log(obj)
+function generateSelectComponent(h, formData = {}, obj, vm) {
+  const { options = [] } = obj
+  const optionComponents = options.map(option => {
+    return h(
+      'ElOption',
+      {
+        props: obj.props || {},
+        style: obj.style,
+        slot: obj.slot
+      },
+      optionComponents
+    )
+  })
+  return h(
+    'ElSelect',
+    {
+      props: obj.props || {},
+      slot: obj.slot,
+      style: obj.style,
+      on: obj.on,
+      nativeOn: obj.nativeOn
+    },
+    optionComponents
+  )
+}
 
+function generateInputComponent(h, formData = {}, obj, vm) {
   const { children = [], key } = obj
   const components = generateChildrenComponents(h, formData, children, vm)
 
